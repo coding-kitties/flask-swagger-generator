@@ -1,12 +1,11 @@
 import re
 import logging
 from pprint import pprint
-from app.exceptions import ApiException
 import os
 import inspect
 from datetime import datetime
 import random
-from app.extensions.auto_generate_swagger_data import AutoGenerateSwaggerData
+from flask_swagger_generator.generators.auto_generate_swagger_data import AutoGenerateSwaggerData
 
 logger = logging.getLogger(__name__)
 swag = AutoGenerateSwaggerData()
