@@ -1,76 +1,117 @@
 import re
-import logging
-from pprint import pprint
 import os
 import inspect
 from datetime import datetime
 import random
-from flask_swagger_generator.generators.auto_generate_swagger_data import AutoGenerateSwaggerData
+from functools import wraps
 
-logger = logging.getLogger(__name__)
-swag = AutoGenerateSwaggerData()
+from flask import Flask
+from flask_swagger_generator.specifiers import SwaggerVersion, \
+    SwaggerThreeSpecifier, SwaggerRequestType
+from flask_swagger_generator.exceptions import SwaggerGeneratorException
+from flask_swagger_generator.specifiers.swagger_specifier \
+    import SwaggerSpecifier
 
 
-class AutoGenerateSwagger:
-
-    # Configuration
-    supported_methods = ['GET', 'POST', 'PUT', 'DELETE']
-    relative_path = '/static/'
-    filename = 'swagger.yaml'
-    app_name = 'Organization Manager Service'
-    version = '1.0.0'
+class Generator:
 
     # Functional
     tab = "  "
-    rules = []
-    file = None
 
-    # Additional Data
-    schemas = None
-    security_schemas = None
+    @staticmethod
+    def of(version: SwaggerVersion):
 
-    def __init__(self, app, additional_data=None):
-        # Create Rules
-        self.list_rules(app)
+        if SwaggerVersion.VERSION_THREE.equals(version):
+            swagger_specifier = SwaggerThreeSpecifier()
+            generator = Generator(swagger_specifier)
+        else:
+            raise SwaggerGeneratorException(
+                "Swagger version {} is not supported".format(version)
+            )
+        return generator
 
-        # Add user added data
-        self.enrich_rules_with_additional_data(self.rules, additional_data.rules)
-        self.schemas = additional_data.schemas
-        self.security_schemas = additional_data.security_schemas
-
-        # Format Data
-        self.get_url_params_and_format_paths(self.rules)
-        self.get_query_params(self.rules)
-        self.format_group_and_function_name(self.rules)
-        self.order_rules_by_method_and_group()
-
-        # print('\n RULES:')
-        # pprint(self.rules)
+    def __init__(self, swagger_specifier: SwaggerSpecifier):
+        self._specifier = swagger_specifier
+        # # Add user added data
+        # self.enrich_rules_with_additional_data(self.rules, additional_data.rules)
+        # self.schemas = additional_data.schemas
+        # self.security_schemas = additional_data.security_schemas
         #
-        # print('\n SCHEMAS:')
-        # pprint(self.schemas)
+        # # Format Data
+        # self.get_url_params_and_format_paths(self.rules)
+        # self.get_query_params(self.rules)
+        # self.format_group_and_function_name(self.rules)
+        # self.order_rules_by_method_and_group()
+        #
+        # # print('\n RULES:')
+        # # pprint(self.rules)
+        # #
+        # # print('\n SCHEMAS:')
+        # # pprint(self.schemas)
+        #
+        # # Write Rules to swagger file
+        # self.file = open(self.get_file_path(), 'w')
+        # self.write_specification()
+        # self.file.close()
 
-        # Write Rules to swagger file
-        self.file = open(self.get_file_path(), 'w')
-        self.write_specification()
-        self.file.close()
+    def generate_swagger(
+            self,
+            app: Flask,
+            destination_path: str,
+            application_name: str = "",
+            application_version: str = ""
+    ):
+        self.index_endpoints(app)
+
+    def schema(self, scheme_object):
+        pass
+
+    def response(self, status_code: int, schema, description: str = ''):
+
+        def swagger_post(func):
+            self.specifier.add_response(
+                func.__name__, schema, status_code, description
+            )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_post
+
+    @property
+    def specifier(self) -> SwaggerSpecifier:
+        return self._specifier
+    #
+    # @specifier.setter
+    # def specifier(self, specifier: SwaggerSpecifier):
+    #     self._specifier = specifier
 
     def get_file_path(self):
         return '{}{}{}'.format(os.getcwd(), self.relative_path, self.filename)
 
-    def list_rules(self, app):
+    def index_endpoints(self, app):
 
-        # put the rules in a collection
         for rule in app.url_map.iter_rules():
+            self.specifier.add_endpoint(
+                path=str(rule),
+                request_types=self.extract_request_types(rule.methods)
+            )
 
-            rule_object = {
-                'rule': rule,
-                'path': str(rule),
-                'method': self.get_method(rule.methods),
-                'endpoint': rule.endpoint
-            }
+    def extract_request_types(self, methods):
+        request_types = []
 
-            self.rules.append(rule_object)
+        # add supported methods to rule
+        for method in methods:
+
+            try:
+                request_type = SwaggerRequestType.from_string(method)
+                request_types.append(request_type.value)
+            except Exception:
+                pass
+
+        return request_types
 
     @staticmethod
     def enrich_rules_with_additional_data(rules, additional_rule_data):
@@ -200,8 +241,10 @@ class AutoGenerateSwagger:
         self.rules = all_rules_sorted
 
     def get_method(self, methods):
+
         # add supported methods to rule
         for supported_method in self.supported_methods:
+
             if supported_method in methods:
                 return supported_method
 
@@ -803,6 +846,8 @@ class AutoGenerateSwagger:
 
         schema = [x for x in self.schemas if list((x.keys()))[0] == schema_name]
         if schema is None:
-            raise ApiException('Schema "{schema}" could not be found'.format(schema=schema_name))
+            raise SwaggerGeneratorException(
+                'Schema "{schema}" could not be found'.format(schema=schema_name)
+            )
         else:
             return True
