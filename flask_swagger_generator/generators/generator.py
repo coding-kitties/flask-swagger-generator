@@ -11,6 +11,7 @@ from flask_swagger_generator.specifiers import SwaggerVersion, \
 from flask_swagger_generator.exceptions import SwaggerGeneratorException
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
+from flask_swagger_generator.utils import ParameterType, SecurityType
 
 
 class Generator:
@@ -32,6 +33,7 @@ class Generator:
 
     def __init__(self, swagger_specifier: SwaggerSpecifier):
         self._specifier = swagger_specifier
+        self.destination_path = None
         # # Add user added data
         # self.enrich_rules_with_additional_data(self.rules, additional_data.rules)
         # self.schemas = additional_data.schemas
@@ -62,13 +64,14 @@ class Generator:
             application_version: str = ""
     ):
         self.index_endpoints(app)
+        self.destination_path = destination_path
 
     def schema(self, scheme_object):
         pass
 
     def response(self, status_code: int, schema, description: str = ''):
 
-        def swagger_post(func):
+        def swagger_response(func):
             self.specifier.add_response(
                 func.__name__, schema, status_code, description
             )
@@ -78,7 +81,49 @@ class Generator:
                 return func(*args, **kwargs)
 
             return wrapper
-        return swagger_post
+        return swagger_response
+
+    def parameter(
+            self, parameter_type: ParameterType, name: str, description=None, required: bool = True, schema=None
+    ):
+
+        def swagger_parameter(func):
+            self.specifier.add_parameter(
+                func.__name__, parameter_type, name, schema, description, required
+            )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_parameter
+
+    def request_body(self, schema):
+        def swagger_request_body(func):
+            self.specifier.add_request_body(
+                func.__name__, schema
+            )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_request_body
+
+    def security(self, security_type: SecurityType):
+        def swagger_security(func):
+            self.specifier.add_security(
+                func.__name__, security_type
+            )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_security
 
     @property
     def specifier(self) -> SwaggerSpecifier:
@@ -92,9 +137,10 @@ class Generator:
         return '{}{}{}'.format(os.getcwd(), self.relative_path, self.filename)
 
     def index_endpoints(self, app):
-
         for rule in app.url_map.iter_rules():
+            function_name = rule.endpoint.split('.')[-1]
             self.specifier.add_endpoint(
+                function_name=function_name,
                 path=str(rule),
                 request_types=self.extract_request_types(rule.methods)
             )

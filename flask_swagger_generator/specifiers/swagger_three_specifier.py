@@ -1,34 +1,62 @@
 from functools import wraps
 from flask_swagger_generator.specifiers.swagger_specifier import SwaggerSpecifier
+from flask_swagger_generator.utils import ParameterType, SecurityType
 
 
 class SwaggerThreeSpecifier(SwaggerSpecifier):
 
     def __init__(self):
         self.endpoints = {}
+        self.responses = {}
+        self.parameters = {}
+        self.request_bodies = {}
         self.schemas = []
-        self.security_schemas = []
+        self.security_schemas = {}
 
-    def add_endpoint(self, path: str, request_types):
-        self.endpoints[path] = request_types
+    def add_endpoint(self,  function_name: str, path: str, request_types):
+        self.endpoints[function_name] = {'path': path, 'request_types': request_types}
 
     def add_response(
             self,
-            identifier: str,
+            function_name: str,
             status_code: int,
             schema,
             description: str = ""
     ):
-        print(identifier)
-        print(status_code)
-        print(self.endpoints)
-        print('adding response')
+
+        if function_name in self.responses:
+            self.responses[function_name] = self.responses[function_name]\
+                .append({'status_code': status_code, 'schema': schema, 'description': description})
+        else:
+            self.responses[function_name] = [{'status_code': status_code, 'schema': schema, 'description': description}]
+
+    def add_parameter(
+            self, function_name, parameter_type: ParameterType, name: str, schema, description, required: bool
+    ):
+
+        if function_name in self.parameters:
+            self.parameters[function_name] = self.parameters[function_name].append({
+                'parameter_type': parameter_type,
+                'name': name,
+                'schema': schema,
+                'description': description
+            })
+        else:
+            self.parameters[function_name] = [{
+                'parameter_type': parameter_type,
+                'name': name,
+                'schema': schema,
+                'description': description
+            }]
 
     def add_query_parameters(self):
         pass
 
-    def add_request_body(self):
-        pass
+    def add_request_body(self, func_name, schema):
+        self.request_bodies[func_name] = schema
+
+    def add_security(self, function_name, security_type: SecurityType):
+        self.security_schemas[function_name] = security_type
 
     def __add_rule(self, name):
         rule = {
@@ -139,9 +167,3 @@ class SwaggerThreeSpecifier(SwaggerSpecifier):
             name: schema_object
         }
         self.schemas.append(schema)
-
-    def add_security_schema(self, name, security_object):
-        schema = {
-            name: security_object
-        }
-        self.security_schemas.append(schema)
