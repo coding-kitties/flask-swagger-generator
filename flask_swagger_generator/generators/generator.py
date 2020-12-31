@@ -1,17 +1,17 @@
 import re
 import os
 import inspect
+from random import randint
 from datetime import datetime
-import random
 from functools import wraps
 
 from flask import Flask
 from flask_swagger_generator.specifiers import SwaggerVersion, \
-    SwaggerThreeSpecifier, SwaggerRequestType
+    SwaggerThreeSpecifier
 from flask_swagger_generator.exceptions import SwaggerGeneratorException
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
-from flask_swagger_generator.utils import ParameterType, SecurityType
+from flask_swagger_generator.utils import SecurityType, RequestType
 
 
 class Generator:
@@ -34,6 +34,7 @@ class Generator:
     def __init__(self, swagger_specifier: SwaggerSpecifier):
         self._specifier = swagger_specifier
         self.destination_path = None
+        self.file = None
         # # Add user added data
         # self.enrich_rules_with_additional_data(self.rules, additional_data.rules)
         # self.schemas = additional_data.schemas
@@ -52,22 +53,26 @@ class Generator:
         # # pprint(self.schemas)
         #
         # # Write Rules to swagger file
-        # self.file = open(self.get_file_path(), 'w')
-        # self.write_specification()
-        # self.file.close()
 
     def generate_swagger(
             self,
             app: Flask,
-            destination_path: str,
-            application_name: str = "",
-            application_version: str = ""
+            destination_path: str = None,
+            application_name: str = None,
+            application_version: str = None
     ):
         self.index_endpoints(app)
-        self.destination_path = destination_path
 
-    def schema(self, scheme_object):
-        pass
+        if not destination_path:
+            self.destination_path = os.path.join(os.curdir, 'swagger.yaml')
+        else:
+            self.destination_path = destination_path
+
+        self.specifier.set_application_name(application_name)
+        self.specifier.set_application_version(application_version)
+        self.file = open(destination_path, 'w')
+        self.write_specification()
+        self.file.close()
 
     def response(self, status_code: int, schema, description: str = ''):
 
@@ -82,22 +87,6 @@ class Generator:
 
             return wrapper
         return swagger_response
-
-    def parameter(
-            self, parameter_type: ParameterType, name: str, description=None, required: bool = True, schema=None
-    ):
-
-        def swagger_parameter(func):
-            self.specifier.add_parameter(
-                func.__name__, parameter_type, name, schema, description, required
-            )
-
-            @wraps(func)
-            def wrapper(*args, **kwargs):
-                return func(*args, **kwargs)
-
-            return wrapper
-        return swagger_parameter
 
     def request_body(self, schema):
         def swagger_request_body(func):
@@ -125,39 +114,31 @@ class Generator:
             return wrapper
         return swagger_security
 
+    def create_schema(self, schema):
+        return self.specifier.create_schema(schema)
+
     @property
     def specifier(self) -> SwaggerSpecifier:
         return self._specifier
-    #
-    # @specifier.setter
-    # def specifier(self, specifier: SwaggerSpecifier):
-    #     self._specifier = specifier
-
-    def get_file_path(self):
-        return '{}{}{}'.format(os.getcwd(), self.relative_path, self.filename)
 
     def index_endpoints(self, app):
+
         for rule in app.url_map.iter_rules():
-            function_name = rule.endpoint.split('.')[-1]
-            self.specifier.add_endpoint(
-                function_name=function_name,
-                path=str(rule),
-                request_types=self.extract_request_types(rule.methods)
-            )
 
-    def extract_request_types(self, methods):
-        request_types = []
-
-        # add supported methods to rule
-        for method in methods:
-
-            try:
-                request_type = SwaggerRequestType.from_string(method)
-                request_types.append(request_type.value)
-            except Exception:
-                pass
-
-        return request_types
+            if len(rule.endpoint.split(".")) > 1:
+                group, function_name = rule.endpoint.split('.')
+                self.specifier.add_endpoint(
+                    function_name=function_name,
+                    path=str(rule),
+                    request_types=rule.methods,
+                    group=group
+                )
+            else:
+                self.specifier.add_endpoint(
+                    function_name=rule.endpoint,
+                    path=str(rule),
+                    request_types=rule.methods,
+                )
 
     @staticmethod
     def enrich_rules_with_additional_data(rules, additional_rule_data):
@@ -301,9 +282,11 @@ class Generator:
         return ''.join(prefix + line for line in string.splitlines(True))
 
     def write_specification(self):
-        self.write_meta()
-        self.write_paths()
-        self.write_components()
+        self.specifier.write(self.file)
+
+        # self.write_meta()
+        # self.write_paths()
+        # self.write_components()
 
     def write_meta(self):
         meta = inspect.cleandoc("""
@@ -333,6 +316,7 @@ class Generator:
 
         headers = []
         paths = []
+
         for rule in self.rules:
 
             group = rule.get('group')
@@ -404,7 +388,7 @@ class Generator:
               operationId: '{function}{random}'
         """.format(
                 method=rule.get('method').lower(),
-                random=random.randint(0, 10000),
+                random=randint(0, 10000),
                 group=rule.get('group', ''),
                 function=rule.get('function')
             )

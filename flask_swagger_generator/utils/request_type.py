@@ -2,15 +2,15 @@ from enum import Enum
 from flask_swagger_generator.exceptions import SwaggerGeneratorException
 
 
-class SwaggerRequestType(Enum):
+class RequestType(Enum):
     """
     Class RequestType: Enum for types of requests
     """
 
-    POST = 'POST'
-    GET = 'GET'
-    DELETE = 'DELETE'
-    PUT = 'PUT'
+    POST = 'post'
+    GET = 'get'
+    DELETE = 'delete'
+    PUT = 'put'
 
     @staticmethod
     def from_string(value: str):
@@ -18,13 +18,13 @@ class SwaggerRequestType(Enum):
         if isinstance(value, str):
 
             if value.lower() == 'post':
-                return SwaggerRequestType.POST
+                return RequestType.POST
             elif value.lower() == 'get':
-                return SwaggerRequestType.GET
+                return RequestType.GET
             elif value.lower() == 'delete':
-                return SwaggerRequestType.DELETE
+                return RequestType.DELETE
             elif value.lower() == 'put':
-                return SwaggerRequestType.PUT
+                return RequestType.PUT
             else:
                 raise SwaggerGeneratorException(
                     'Could not convert value {} to a request type'.format(
@@ -44,7 +44,7 @@ class SwaggerRequestType(Enum):
         else:
 
             try:
-                data_base_type = SwaggerRequestType.from_string(other)
+                data_base_type = RequestType.from_string(other)
                 return data_base_type == self
             except SwaggerGeneratorException:
                 pass

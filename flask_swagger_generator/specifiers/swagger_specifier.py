@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List
-from flask_swagger_generator.specifiers.swagger_request_types import \
-    SwaggerRequestType
-from flask_swagger_generator.utils import ParameterType, SecurityType
+from flask_swagger_generator.utils import RequestType, SecurityType
 
 
 class SwaggerSpecifier(ABC):
+
+    def __init__(self):
+        self.application_name = None
+        self.application_version = None
 
     @abstractmethod
     def add_response(
@@ -18,14 +20,14 @@ class SwaggerSpecifier(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_endpoint(self, function_name, path: str, request_types: List[SwaggerRequestType]):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def add_parameter(
-            self, function_name, parameter_type: ParameterType, name: str, schema, description, required: bool
+    def add_endpoint(
+            self,
+            function_name,
+            path: str,
+            request_types: List[RequestType],
+            group: str = None
     ):
-        raise not NotImplementedError()
+        raise NotImplementedError()
 
     @abstractmethod
     def add_query_parameters(self):
@@ -38,3 +40,9 @@ class SwaggerSpecifier(ABC):
     @abstractmethod
     def add_security(self, function_name, security_type: SecurityType):
         raise NotImplementedError()
+
+    def set_application_name(self, application_name):
+        self.application_name = application_name
+
+    def set_application_version(self, application_version):
+        self.application_version = application_version
