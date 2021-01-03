@@ -1,0 +1,152 @@
+openapi: 3.0.1
+info:
+  title: Application
+  description: Generated at 02/01/2021 23:20:18. This is the swagger
+    ui based on the open api 3.0 specification of the Application
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  - url: /
+paths:
+  '/objects/{object_id}':
+    get:
+      tags:
+      - objects
+      operationId: 'retrieve_object'
+      responses:
+        '200':
+          $ref: '#/components/responses/retrieve_object_response'
+      parameters:
+      - in: path
+        name: object_id
+        schema:
+          type: integer
+        description: None
+        required: True
+    delete:
+      tags:
+      - objects
+      operationId: 'delete_object'
+      responses:
+        '204':
+          $ref: '#/components/responses/delete_object_response'
+      security:
+        - bearerAuth: []
+      parameters:
+      - in: path
+        name: object_id
+        schema:
+          type: integer
+        description: None
+        required: True
+    put:
+      tags:
+      - objects
+      operationId: 'update_object'
+      requestBody:
+        $ref: 'update_object_request_body'
+      responses:
+        '200':
+          $ref: '#/components/responses/update_object_response'
+      security:
+        - bearerAuth: []
+      parameters:
+      - in: path
+        name: object_id
+        schema:
+          type: integer
+        description: None
+        required: True
+    post:
+      tags:
+      - objects
+      operationId: 'create_object'
+      requestBody:
+        $ref: 'create_object_request_body'
+      responses:
+        '201':
+          $ref: '#/components/responses/create_object_response'
+      parameters:
+      - in: path
+        name: object_id
+        schema:
+          type: integer
+        description: None
+        required: True
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  requestBodies:
+    update_object_request_body:
+      description: None
+      required: True
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/schema_three'
+    create_object_request_body:
+      description: None
+      required: True
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/create_object_request_body'
+  responses:
+    retrieve_object_response:
+      description: retrieve_object response
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/schema_two'
+    delete_object_response:
+      description: delete_object response
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/schema_two'
+    update_object_response:
+      description: update_object response
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/schema_two'
+    create_object_response:
+      description: create_object response
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/create_object_response'
+  schemas:
+    schema_two:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    schema_three:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    create_object_request_body:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    create_object_response:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

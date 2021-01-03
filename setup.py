@@ -12,14 +12,14 @@ with open('requirements.txt') as f:
 setuptools.setup(
     name="flask-swagger-generator",
     version=VERSION,
-    license="BSL-1.1",
+    license="MIT",
     author="coding kitties",
-    description="A library for generating swagger specifications for "
+    description="A library for generating swagger open api specifications for "
                 "the Flask web framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/coding-kitties/flask-swagger-generator.git",
-    download_url='https://github.com/coding-kitties/investing-algorithm-framework/archive/{}.tar.gz'.format(VERSION),
+    download_url='https://github.com/coding-kitties/flask-swagger-generator/archive/{}.tar.gz'.format(VERSION),
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     keywords=['Flask', 'swagger', 'swagger generator', 'OpenAPI'],
     classifiers=[
@@ -32,6 +32,6 @@ setuptools.setup(
         "License :: MIT",
     ],
     install_requires=required,
-    python_requires='>=3.6',
+    python_requires='>=3',
     include_package_data=True,
 )
