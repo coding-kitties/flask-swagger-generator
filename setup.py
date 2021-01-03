@@ -19,7 +19,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/coding-kitties/flask-swagger-generator.git",
-    download_url='https://github.com/coding-kitties/flask-swagger-generator/archive/{}.tar.gz'.format(VERSION),
     packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
     keywords=['Flask', 'swagger', 'swagger generator', 'OpenAPI'],
     classifiers=[
