@@ -20,6 +20,8 @@ from flask_swagger_generator.generators import Generator
 from flask_swagger_generator.specifiers import SwaggerVersion
 from flask_swagger_generator.utils import SecurityType
 
+swagger_destination_path = '/static/swagger.yaml'
+
 # Create the bluepints
 blueprint = Blueprint('objects', __name__)
 
@@ -38,4 +40,5 @@ def update_object(object_id):
     return jsonify({'id': 1, 'name': 'test_object_name'}), 201
 
 app.register_blueprint(blueprint)
+generator.generate_swagger(app, destination_path=swagger_destination_path)
 ```
