@@ -94,6 +94,14 @@ class SwaggerSchema(SwaggerModel):
             return InputType.NUMBER
         elif isinstance(value, fields.List):
             return InputType.ARRAY
+        elif isinstance(value, fields.Email):
+            return InputType.STRING
+        elif isinstance(value, fields.Boolean):
+            return InputType.BOOLEAN
+        elif isinstance(value, fields.DateTime):
+            return InputType.DATE_TIME
+        elif isinstance(value, fields.URL):
+            return InputType.STRING
         else:
             raise SwaggerGeneratorException(
                 "Type {} is not supported".format(type(value))

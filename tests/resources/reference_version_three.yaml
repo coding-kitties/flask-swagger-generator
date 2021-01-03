@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Application
-  description: Generated at 03/01/2021 19:26:55. This is the swagger
+  description: Generated at 03/01/2021 20:29:35. This is the swagger
     ui based on the open api 3.0 specification of the Application
   version: 1.0.0
 externalDocs:
@@ -132,13 +132,19 @@ components:
     schema_three:
       type: object
       properties:
-        name:
-          type: string
-        id:
+        attribute_one:
           type: integer
-        child:
-          $ref: '#/components/schemas/child'
-    child:
+        attribute_four:
+          type: boolean
+        attribute_three:
+          type: string
+        attribute_five:
+          type: string
+        attribute_two:
+          type: string
+        attribute_six:
+          $ref: '#/components/schemas/attribute_six'
+    attribute_six:
       type: object
       properties:
         name:

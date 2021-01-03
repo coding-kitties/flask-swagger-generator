@@ -30,9 +30,12 @@ class ObjectChildDeserializer(Schema):
 
 
 class ObjectDeserializer(Schema):
-    id = fields.Integer()
-    name = fields.String()
-    child = fields.Nested(ObjectChildDeserializer(many=False))
+    attribute_one = fields.Int()
+    attribute_two = fields.Str()
+    attribute_three = fields.Email()
+    attribute_four = fields.Boolean()
+    attribute_five = fields.URL()
+    attribute_six = fields.Nested(ObjectChildDeserializer(many=False))
 
 
 schema_two = generator.create_schema(
