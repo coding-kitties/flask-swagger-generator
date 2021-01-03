@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Application
-  description: Generated at 02/01/2021 23:20:18. This is the swagger
+  description: Generated at 03/01/2021 19:26:55. This is the swagger
     ui based on the open api 3.0 specification of the Application
   version: 1.0.0
 externalDocs:
@@ -95,7 +95,7 @@ components:
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/create_object_request_body'
+                 $ref: '#/components/schemas/create_object_request_body_schema'
   responses:
     retrieve_object_response:
       description: retrieve_object response
@@ -120,7 +120,7 @@ components:
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/create_object_response'
+                 $ref: '#/components/schemas/create_object_response_schema'
   schemas:
     schema_two:
       type: object
@@ -132,18 +132,27 @@ components:
     schema_three:
       type: object
       properties:
-        id:
-          type: integer
         name:
           type: string
-    create_object_request_body:
+        id:
+          type: integer
+        child:
+          $ref: '#/components/schemas/child'
+    child:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+    create_object_request_body_schema:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
-    create_object_response:
+    create_object_response_schema:
       type: object
       properties:
         id:

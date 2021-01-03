@@ -29,7 +29,6 @@ setuptools.setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         "Topic :: Software Development",
-        "License :: MIT",
     ],
     install_requires=required,
     python_requires='>=3',

@@ -24,9 +24,15 @@ class ObjectSerializer(Schema):
     name = fields.String()
 
 
+class ObjectChildDeserializer(Schema):
+    id = fields.Integer()
+    name = fields.String()
+
+
 class ObjectDeserializer(Schema):
     id = fields.Integer()
     name = fields.String()
+    child = fields.Nested(ObjectChildDeserializer(many=False))
 
 
 schema_two = generator.create_schema(
