@@ -7,7 +7,7 @@ APIs expressed using JSON and YAML.
 Install and update using pip:
 
 ```
-pip install -U Flask
+pip install flask-swagger-generator
 ```
 
 ## A Simple Example
