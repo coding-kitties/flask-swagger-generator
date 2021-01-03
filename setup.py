@@ -12,9 +12,9 @@ with open('requirements.txt') as f:
 setuptools.setup(
     name="flask-swagger-generator",
     version=VERSION,
-    license="BSL-1.1",
+    license="MIT",
     author="coding kitties",
-    description="A library for generating swagger specifications for "
+    description="A library for generating swagger open api specifications for "
                 "the Flask web framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,6 +32,6 @@ setuptools.setup(
         "License :: MIT",
     ],
     install_requires=required,
-    python_requires='>=3.6',
+    python_requires='>=3',
     include_package_data=True,
 )

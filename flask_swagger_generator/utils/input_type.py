@@ -7,10 +7,10 @@ class InputType(Enum):
     Class SwaggerVersion: Enum for types of swagger version
     """
 
-    INTEGER = 'int'
+    INTEGER = 'integer'
     NUMBER = 'number'
     BOOLEAN = 'boolean'
-    STRING = 'str'
+    STRING = 'string'
     ARRAY = 'array'
     OBJECT = 'object'
 
@@ -55,3 +55,17 @@ class InputType(Enum):
                 pass
 
             return other == self.value
+
+    def get_flask_input_type_value(self):
+        if self.value.lower() == 'integer':
+            return 'int'
+        elif self.value.lower() in 'number':
+            return 'num'
+        elif self.value.lower() in 'boolean':
+            return 'bool'
+        elif self.value.lower() in 'string':
+            return 'str'
+        elif self.value.lower() == 'array':
+            return 'array'
+        elif self.value.lower() == 'object':
+            return 'object'

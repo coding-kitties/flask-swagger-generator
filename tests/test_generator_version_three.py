@@ -1,19 +1,23 @@
 import os
+from deepdiff import DeepDiff
+import pathlib
+
 from flask_testing import TestCase
 from tests.resources.test_app import create_app
 from flask import Blueprint, jsonify
 from flask_swagger_generator.generators import Generator
 from flask_swagger_generator.specifiers import SwaggerVersion
-from flask_swagger_generator.utils import ParameterType, SecurityType
+from flask_swagger_generator.utils import SecurityType
 
 from marshmallow import Schema, fields
+
+from tests.resources.utils import yaml_as_dict
 
 app = create_app()
 
 generator = Generator.of(SwaggerVersion.VERSION_THREE)
 blueprint = Blueprint('objects', __name__)
 
-# object_id_parameter = generator.create_parameter(parameter_type=ParameterType.PATH, name='object_id')
 
 class ObjectSerializer(Schema):
     id = fields.Integer()
@@ -25,42 +29,38 @@ class ObjectDeserializer(Schema):
     name = fields.String()
 
 
-# schema_one = generator.create_schema(['id', 'name'])
-# schema_two = generator.create_schema({'id': 10, 'name': 'test_object'})
-# schema_three = generator.create_schema(ObjectDeserializer())
+schema_two = generator.create_schema(
+    'schema_two', {'id': 10, 'name': 'test_object'}
+)
+schema_three = generator.create_schema('schema_three', ObjectDeserializer())
 
 
-# @generator.response(status_code=200, schema={'id': 10, 'name': 'test_object'})
-# @generator.parameter(
-#     parameter_type=ParameterType.PATH, name="object_id", description="The ID of the object to retrieve", required=True
-# )
-# @generator.security(SecurityType.BEARER_AUTH)
+@generator.response(200, schema_two)
 @blueprint.route('/objects/<int:object_id>', methods=['GET'])
 def retrieve_object(object_id, child_id):
     return jsonify({'objects': []}), 200
 
 
-# @generator.response(204, schema_one)
-# @generator.parameter(
-#     parameter_type=ParameterType.PATH, name="object_id", description="The ID of the object to retrieve", required=True
-# )
-# @generator.security(SecurityType.BEARER_AUTH)
+@generator.response(204, schema_two)
+@generator.security(SecurityType.BEARER_AUTH)
 @blueprint.route('/objects/<int:object_id>', methods=['DELETE'])
 def delete_object(object_id):
     return jsonify({'objects': []}), 200
 
 
-@generator.request_body(ObjectDeserializer)
+@generator.response(200, schema_two)
+@generator.security(SecurityType.BEARER_AUTH)
+@generator.request_body(schema_three)
 @blueprint.route('/objects/<int:object_id>', methods=['PUT'])
 def update_object(object_id):
     pass
 
-#
-# @generator.response(status_code=201, schema={'id': 10, 'name': 'test_object'})
-# @generator.request_body({'id': 10, 'name': 'test_object'})
-# @blueprint.route('/objects/<int:object_id>', methods=['GET'])
-# def create_object(object_id):
-#     return jsonify({'objects': []}), 200
+
+@generator.response(status_code=201, schema={'id': 10, 'name': 'test_object'})
+@generator.request_body({'id': 10, 'name': 'test_object'})
+@blueprint.route('/objects/<int:object_id>', methods=['POST'])
+def create_object(object_id):
+    return jsonify({'objects': []}), 200
 
 
 app.register_blueprint(blueprint)
@@ -78,11 +78,24 @@ class AppTestBase(TestCase):
         super(AppTestBase, self).tearDown()
 
     def test(self):
-        generator.generate_swagger(
-            self.app, destination_path='resources/generated.yaml'
-        )
-        # self.assertEqual(3, len(generator.specifier.endpoints.keys()))
-        # self.assertEqual(2, len(generator.specifier.responses.keys()))
-        # self.assertEqual(2, len(generator.specifier.parameters.keys()))
-        # self.assertEqual(2, len(generator.specifier.security_schemas.keys()))
 
+        generated_path = os.path.join(
+            pathlib.Path(__file__).parent.absolute()
+        ) + '/resources/generated.yaml'
+
+        reference_path = os.path.join(
+            pathlib.Path(__file__).parent.absolute()
+        ) + '/resources/reference_version_three.yaml'
+
+        generator.generate_swagger(
+            self.app, generated_path
+        )
+
+        generated_yaml = yaml_as_dict(generated_path)
+        reference_yaml = yaml_as_dict(reference_path)
+
+        reference_yaml['info'].pop('description')
+        generated_yaml['info'].pop('description')
+
+        difference = DeepDiff(generated_yaml, reference_yaml, ignore_order=True)
+        self.assertEqual({}, difference)

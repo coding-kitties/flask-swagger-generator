@@ -46,3 +46,7 @@ class SwaggerSpecifier(ABC):
 
     def set_application_version(self, application_version):
         self.application_version = application_version
+
+    @abstractmethod
+    def clean(self):
+        pass
