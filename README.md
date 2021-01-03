@@ -10,6 +10,9 @@ Install and update using pip:
 pip install flask-swagger-generator
 ```
 
+## Documentation
+COMING SOON
+
 ## A Simple Example
 
 ```python
