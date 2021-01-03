@@ -52,27 +52,40 @@ class SwaggerSecurity(SwaggerModel):
 
 class SwaggerSchema(SwaggerModel):
 
-    def __init__(self, reference_name, schema):
+    def __init__(self, reference_name, schema, nested_schemas: List = None):
         super(SwaggerSchema, self).__init__()
         self.reference_name = reference_name
         self.schema = schema
         self.properties = {}
 
+        if not nested_schemas:
+            self.nested_schemas = []
+        else:
+            self.nested_schemas = nested_schemas
+
         if isinstance(schema, dict):
 
             for key in schema:
-                self.properties[key] = self.get_type(schema[key])
+                self.properties[key] = "type: {}".format(
+                    self.get_type(schema[key]).value
+                )
 
         elif isinstance(schema, MarshmallowSchema):
+
             for field in schema.fields:
 
-                if field != 'marshmallow schema':
-                    self.properties[field] = self.get_marshmallow_type(
-                        schema.fields[field]
+                try:
+                    self.properties[field] = "type: {}".format(
+                        self.get_marshmallow_type(
+                            schema.fields[field]
+                        ).value
                     )
+                except SwaggerGeneratorException:
+                    pass
 
     @staticmethod
     def get_marshmallow_type(value):
+
         if isinstance(value, fields.Integer):
             return InputType.INTEGER
         elif isinstance(value, fields.String):
@@ -82,7 +95,7 @@ class SwaggerSchema(SwaggerModel):
         elif isinstance(value, fields.List):
             return InputType.ARRAY
         else:
-            SwaggerGeneratorException(
+            raise SwaggerGeneratorException(
                 "Type {} is not supported".format(type(value))
             )
 
@@ -120,8 +133,8 @@ class SwaggerSchema(SwaggerModel):
             property_entry = inspect.cleandoc(
                 """
                     {}:
-                      type: {}
-                """.format(property_key, self.properties[property_key].value)
+                      {}
+                """.format(property_key, self.properties[property_key])
             )
             property_entry = self.indent(property_entry, 4 * self.TAB)
             file.write(property_entry)
@@ -615,7 +628,10 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
             description: str = ""
     ):
         if not isinstance(schema, SwaggerSchema):
-            schema = SwaggerSchema(function_name + "_response", schema)
+            schema = SwaggerSchema(
+                function_name + "_response_schema",
+                schema
+            )
             self.schemas.append(schema)
 
         swagger_response = SwaggerResponse(
@@ -630,7 +646,10 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
     def add_request_body(self, function_name: str, schema):
 
         if not isinstance(schema, SwaggerSchema):
-            schema = SwaggerSchema(function_name + "_request_body", schema)
+            schema = SwaggerSchema(
+                function_name + "_request_body_schema",
+                schema
+            )
             self.schemas.append(schema)
 
         swagger_request_body = SwaggerRequestBody(
@@ -651,6 +670,22 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
     def create_schema(self, reference_name, properties):
         schema = SwaggerSchema(reference_name, properties)
         self.schemas.append(schema)
+
+        # Check if nested fields are present
+        if isinstance(properties, MarshmallowSchema):
+
+            for marshmallow_field in properties.fields:
+
+                if isinstance(
+                    properties.fields[marshmallow_field], fields.Nested
+                ):
+                    nested_schema = SwaggerSchema(
+                        marshmallow_field,
+                        properties.fields[marshmallow_field].schema
+                    )
+                    schema.properties[marshmallow_field] = "$ref: '#/components/schemas/{}'".format(nested_schema.reference_name)
+                    self.schemas.append(nested_schema)
+
         return schema
 
     def clean(self):

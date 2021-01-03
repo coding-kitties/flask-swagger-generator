@@ -13,6 +13,7 @@ class InputType(Enum):
     STRING = 'string'
     ARRAY = 'array'
     OBJECT = 'object'
+    NESTED = 'nested'
 
     @staticmethod
     def from_string(value: str):
@@ -31,6 +32,8 @@ class InputType(Enum):
                 return InputType.ARRAY
             elif value.lower() == 'object':
                 return InputType.OBJECT
+            elif value.lower() == 'nested':
+                return InputType.NESTED
             else:
                 raise SwaggerGeneratorException(
                     'Could not convert value {} to a input type'.format(
