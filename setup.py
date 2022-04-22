@@ -1,5 +1,5 @@
 import setuptools
-from flask_swagger_generator import get_version
+from version import get_version
 
 VERSION = get_version()
 

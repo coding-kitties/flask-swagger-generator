@@ -1,17 +1,14 @@
-import re
 import os
-import inspect
-from random import randint
-from datetime import datetime
 from functools import wraps
 
 from flask import Flask
+
+from flask_swagger_generator.exceptions import SwaggerGeneratorException
 from flask_swagger_generator.specifiers import SwaggerVersion, \
     SwaggerThreeSpecifier
-from flask_swagger_generator.exceptions import SwaggerGeneratorException
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
-from flask_swagger_generator.utils import SecurityType, RequestType
+from flask_swagger_generator.utils import SecurityType
 
 
 class Generator:
