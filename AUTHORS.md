@@ -6,3 +6,22 @@
 <a href="https://github.com/MDUYN">
   <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" width="200px" />
 </a>
+
+# Jibbe Verhave | Mod and Contributor
+<a href="https://www.linkedin.com/in/jibbe-verhave-b7465749/">
+  <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" width="200px" />
+</a>
+<br/>
+<a href="https://github.com/Chirema">
+  <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" width="200px" />
+</a>
+
+# Oracking Amenreynolds | Contributor
+<a href="https://www.linkedin.com/in/oracking-amenreynolds/">
+  <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" width="200px" />
+</a>
+<br/>
+<a href="https://github.com/Oracking">
+  <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" width="200px" />
+</a>
+
