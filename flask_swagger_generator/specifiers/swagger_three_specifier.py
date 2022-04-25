@@ -245,7 +245,7 @@ class SwaggerRequestBody(SwaggerModel):
         request_body_entry = inspect.cleandoc(
             """
                 requestBody:
-                  $ref: '{}' 
+                  $ref: '#/components/requestBodies/{}' 
             """.format(self.request_body_reference)
         )
 

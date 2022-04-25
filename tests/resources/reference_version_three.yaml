@@ -46,7 +46,7 @@ paths:
       - objects
       operationId: 'update_object'
       requestBody:
-        $ref: 'update_object_request_body'
+        $ref: '#/components/requestBodies/update_object_request_body'
       responses:
         '200':
           $ref: '#/components/responses/update_object_response'
@@ -64,7 +64,7 @@ paths:
       - objects
       operationId: 'create_object'
       requestBody:
-        $ref: 'create_object_request_body'
+        $ref: '#/components/requestBodies/create_object_request_body'
       responses:
         '201':
           $ref: '#/components/responses/create_object_response'
