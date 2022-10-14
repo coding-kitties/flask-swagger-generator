@@ -68,7 +68,7 @@ class SwaggerSchema(SwaggerModel):
             for key in schema:
                 self.properties[key] = "type: {}".format(
                     self.get_type(schema[key]).value
-                )
+                ) + "\n\t\t      example: {}".format(schema[key])
 
         elif isinstance(schema, MarshmallowSchema):
 
@@ -118,6 +118,8 @@ class SwaggerSchema(SwaggerModel):
             return InputType.NUMBER
         elif isinstance(value, list):
             return InputType.ARRAY
+        elif isinstance(value, dict):
+            return InputType.OBJECT
         else:
             SwaggerGeneratorException(
                 "Type {} is not supported".format(type(value))
