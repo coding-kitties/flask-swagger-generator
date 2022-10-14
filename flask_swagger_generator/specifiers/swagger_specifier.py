@@ -41,6 +41,10 @@ class SwaggerSpecifier(ABC):
     def add_security(self, function_name, security_type: SecurityType):
         raise NotImplementedError()
 
+    @abstractmethod
+    def add_path_tag(self, function_name, tag):
+        raise NotImplementedError()
+
     def set_application_name(self, application_name):
         self.application_name = application_name
 

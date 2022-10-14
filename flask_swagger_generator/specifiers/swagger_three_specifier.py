@@ -462,6 +462,7 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
         self.schemas = []
         self.responses = []
         self.securities = []
+        self.path_tags = []
 
     def perform_write(self, file):
         # Add all request bodies to request_types with same function name
@@ -674,6 +675,10 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
 
         security_model = SwaggerSecurity([function_name], security_type)
         self.securities.append(security_model)
+
+    def add_path_tag(self, function_name: str, tag):
+        path_tag = {"function_name": function_name, "tag": tag}
+        self.path_tags.append(path_tag)
 
     def create_schema(self, reference_name, properties):
         schema = SwaggerSchema(reference_name, properties)
