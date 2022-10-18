@@ -105,6 +105,32 @@ class Generator:
             return wrapper
         return swagger_security
 
+    def query_parameters(self, parameters):
+        """Example: 
+        @generator.query_parameters(parameters = [
+                        {
+                            "name":"string",
+                            "type":"string",
+                            "description":"string",
+                            "required": false,
+                            "allowReserved": false
+                        }
+                    ])
+        """
+        def swagger_query_parameters(func):
+
+            if not self.generated:
+                self.specifier.add_query_parameters(
+                    func.__name__, parameters
+                )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_query_parameters
+
     def create_schema(self, reference_name, properties):
         return self.specifier.create_schema(reference_name, properties)
 

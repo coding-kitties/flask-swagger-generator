@@ -368,6 +368,49 @@ class SwaggerPathParameter(SwaggerModel):
         file.write("\n")
 
 
+class SwaggerQueryParameter(SwaggerModel):
+
+    def __init__(
+            self,
+            function_name: str = None,
+            name: str = None,
+            input_type: str = None,
+            description: str = None,
+            required: bool = False,
+            allowReserved: bool = False
+    ):
+        super(SwaggerQueryParameter, self).__init__()
+        self.function_name = function_name
+        self.name = name
+        self.input_type = InputType.from_string(input_type)
+        self.description = description
+        self.required = required
+        self.allowReserved = allowReserved
+
+    def perform_write(self, file):
+        parameter_entry = inspect.cleandoc(
+            """
+                - in: query
+                  name: {name}
+                  schema:
+                    type: {input_type}
+                  description: {description}
+                  required: {required}
+                  allowReserved: {allowReserved}
+            """.format(
+                name=self.name,
+                required=self.required,
+                description=self.description,
+                input_type=self.input_type.value,
+                allowReserved=self.allowReserved
+            )
+        )
+
+        param = self.indent(parameter_entry, 3 * self.TAB)
+        file.write(param)
+        file.write("\n")
+
+
 class SwaggerPath(SwaggerModel):
 
     def __init__(self, func_name, group, path, request_types: List[str]):
@@ -394,38 +437,12 @@ class SwaggerPath(SwaggerModel):
                 self.add_swagger_model(swagger_request_type)
 
     def perform_write(self, file):
-        self.index_path_parameters()
         self.format_path()
 
         path_entry = "'{path}':".format(path=self.path)
         path = self.indent(path_entry, self.TAB)
         file.write(path)
         file.write("\n")
-
-    def index_path_parameters(self):
-        parameters = re.findall("<(.*?)>", self.path)
-        swagger_request_types = self.get_swagger_child_models_of_type(
-            SwaggerRequestType
-        )
-        parameter_models = []
-
-        if parameters:
-
-            for parameter in parameters:
-                input_type, name = parameter.split(':')
-                parameter_models.append(SwaggerPathParameter(input_type, name))
-
-            for swagger_request_type in swagger_request_types:
-                parameters = swagger_request_type\
-                    .get_swagger_child_models_of_type(
-                        SwaggerParameters
-                )
-
-                if not parameters:
-                    parameters = SwaggerParameters()
-                    swagger_request_type.add_swagger_model(parameters)
-
-                parameters.add_swagger_models(parameter_models)
 
     def format_path(self):
         if len(re.findall("<(.*?)>", self.path)) > 0:
@@ -438,20 +455,22 @@ class SwaggerPath(SwaggerModel):
                 .get_swagger_child_models_of_type(
                     SwaggerParameters
             )
-            path_parameters = parameters[-1]\
-                .get_swagger_child_models_of_type(
-                    SwaggerPathParameter
-            )
 
-            for path_parameter in path_parameters:
-
-                self.path = self.path.replace(
-                    "<{}:{}>".format(
-                        path_parameter.input_type.get_flask_input_type_value(),
-                        path_parameter.name
-                    ),
-                    "{" + path_parameter.name + "}"
+            if parameters:
+                path_parameters = parameters[-1]\
+                    .get_swagger_child_models_of_type(
+                        SwaggerPathParameter
                 )
+
+                for path_parameter in path_parameters:
+
+                    self.path = self.path.replace(
+                        "<{}:{}>".format(
+                            path_parameter.input_type.get_flask_input_type_value(),
+                            path_parameter.name
+                        ),
+                        "{" + path_parameter.name + "}"
+                    )
 
 
 class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
@@ -462,9 +481,11 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
         self.schemas = []
         self.responses = []
         self.securities = []
+        self.query_parameters = []
 
     def perform_write(self, file):
         # Add all request bodies to request_types with same function name
+        self._add_parameters_to_paths()
         self._add_request_bodies_to_paths()
         self._add_responses_to_paths()
         self._add_securities_to_paths()
@@ -604,6 +625,43 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
                             in security.function_names:
                         swagger_request_type.add_swagger_model(security)
 
+    def _add_parameters_to_paths(self):
+        swagger_paths = self.get_swagger_child_models_of_type(SwaggerPath)
+
+        for swagger_path in swagger_paths:
+
+            swagger_request_types = swagger_path \
+                .get_swagger_child_models_of_type(
+                    SwaggerRequestType
+                )
+
+            parameter_models = []
+            path_parameters = re.findall("<(.*?)>", swagger_path.path)
+
+            if path_parameters:
+                for path_parameter in path_parameters:
+                    input_type, name = path_parameter.split(':')
+                    parameter_models.append(SwaggerPathParameter(input_type, name))
+
+            for swagger_request_type in swagger_request_types:
+
+                for query_parameter in self.query_parameters:
+                    if query_parameter.function_name \
+                        == swagger_request_type.function_name:
+                        parameter_models.append(query_parameter)
+
+                if parameter_models:
+                    parameters = swagger_request_type\
+                        .get_swagger_child_models_of_type(
+                            SwaggerParameters
+                    )
+
+                    if not parameters:
+                        parameters = SwaggerParameters()
+                        swagger_request_type.add_swagger_model(parameters)
+
+                    parameters.add_swagger_models(parameter_models)
+
     def add_endpoint(
             self,
             function_name: str,
@@ -648,8 +706,19 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
 
         self.responses.append(swagger_response)
 
-    def add_query_parameters(self):
-        pass
+    def add_query_parameters(
+            self, 
+            function_name: str, 
+            parameters: list
+    ):
+
+        for parameter in parameters:
+            swagger_query_parameter = SwaggerQueryParameter(
+                function_name, parameter.get("name"), parameter.get("type", "string"),
+                parameter.get("description", None), parameter.get("required", False),
+                parameter.get("allowReserved", False)
+            )
+            self.query_parameters.append(swagger_query_parameter)
 
     def add_request_body(self, function_name: str, schema):
 
