@@ -37,6 +37,8 @@ class InputType(Enum):
                 return InputType.NESTED
             elif value.lower() == 'datetime':
                 return InputType.STRING
+            elif value.lower() == 'path':
+                return InputType.STRING
             else:
                 raise SwaggerGeneratorException(
                     'Could not convert value {} to a input type'.format(
