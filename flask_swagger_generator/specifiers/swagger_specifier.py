@@ -30,7 +30,7 @@ class SwaggerSpecifier(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def add_query_parameters(self):
+    def add_query_parameters(self, function_name, parameters):
         raise NotImplementedError()
 
     @abstractmethod
