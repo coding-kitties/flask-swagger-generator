@@ -25,7 +25,7 @@ class ObjectDeserializer(Schema):
     attribute_six = fields.Nested(ObjectChildDeserializer(many=False))
 
 
-class TestAPI():
+class TestVersionThreeAPI():
     
     def __init__(self):
         self.app = create_app()

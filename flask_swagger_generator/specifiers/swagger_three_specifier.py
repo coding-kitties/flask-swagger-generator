@@ -482,11 +482,12 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
               description: Find out more about Swagger
               url: 'http://swagger.io'
             servers:
-              - url: /
+              - url: {server_url}
             """.format(
                 name=self.application_name,
                 version=self.application_version,
-                time=datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                time=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                server_url=self.server_url
             )
         )
 
