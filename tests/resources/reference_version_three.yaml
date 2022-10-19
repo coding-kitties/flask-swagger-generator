@@ -127,8 +127,10 @@ components:
       properties:
         id:
           type: integer
+          example: 10
         name:
           type: string
+          example: test_object
     schema_three:
       type: object
       properties:
@@ -156,12 +158,16 @@ components:
       properties:
         id:
           type: integer
+          example: 10
         name:
           type: string
+          example: test_object
     create_object_response_schema:
       type: object
       properties:
         id:
           type: integer
+          example: 10
         name:
           type: string
+          example: test_object
