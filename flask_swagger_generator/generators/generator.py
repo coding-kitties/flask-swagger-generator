@@ -50,7 +50,7 @@ class Generator:
 
         self.specifier.set_application_name(application_name)
         self.specifier.set_application_version(application_version)
-        self.file = open(destination_path, 'w')
+        self.file = open(self.destination_path, 'w')
         self.write_specification()
         self.file.close()
         self.generated = True
