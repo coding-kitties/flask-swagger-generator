@@ -8,6 +8,7 @@ class SwaggerSpecifier(ABC):
     def __init__(self):
         self.application_name = None
         self.application_version = None
+        self.server_url = None
 
     @abstractmethod
     def add_response(
@@ -50,6 +51,9 @@ class SwaggerSpecifier(ABC):
 
     def set_application_version(self, application_version):
         self.application_version = application_version
+
+    def set_server_url(self, server_url):
+        self.server_url = server_url
 
     @abstractmethod
     def clean(self):
