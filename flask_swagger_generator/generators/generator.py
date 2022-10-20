@@ -107,6 +107,21 @@ class Generator:
             return wrapper
         return swagger_security
 
+    def path_tag(self, tag):
+        def swagger_path_tag(func):
+
+            if not self.generated:
+                self.specifier.add_path_tag(
+                    func.__name__, tag
+                )
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapper
+        return swagger_path_tag
+
     def create_schema(self, reference_name, properties):
         return self.specifier.create_schema(reference_name, properties)
 
@@ -118,17 +133,16 @@ class Generator:
 
         for rule in app.url_map.iter_rules():
 
+            group = None
+            function_name = rule.endpoint
             if len(rule.endpoint.split(".")) > 1:
                 group, function_name = rule.endpoint.split('.')
-                self.specifier.add_endpoint(
+            for path_tag in self.specifier.path_tags:
+                if path_tag.get("function_name") == function_name:
+                    group = path_tag.get("tag")
+            self.specifier.add_endpoint(
                     function_name=function_name,
                     path=str(rule),
                     request_types=rule.methods,
                     group=group
-                )
-            else:
-                self.specifier.add_endpoint(
-                    function_name=rule.endpoint,
-                    path=str(rule),
-                    request_types=rule.methods,
                 )
