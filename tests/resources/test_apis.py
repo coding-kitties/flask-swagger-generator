@@ -25,14 +25,17 @@ class ObjectDeserializer(Schema):
     attribute_six = fields.Nested(ObjectChildDeserializer(many=False))
 
 
-class TestVersionThreeAPI():
-    
+class APITestBase():
+
     def __init__(self):
         self.app = create_app()
         self.generator = Generator.of(SwaggerVersion.VERSION_THREE)
         self.blueprint = Blueprint('objects', __name__)
         self.create_test_api()
         self.app.register_blueprint(self.blueprint)
+
+
+class TestVersionThreeAPI(APITestBase):
 
     def create_test_api(self):
 
@@ -43,7 +46,6 @@ class TestVersionThreeAPI():
         'schema_two', {'id': 10, 'name': 'test_object'}
         )
         schema_three = generator.create_schema('schema_three', ObjectDeserializer())
-
 
         @generator.response(200, schema_two)
         @blueprint.route('/objects/<int:object_id>', methods=['GET'])
@@ -70,4 +72,19 @@ class TestVersionThreeAPI():
         @generator.request_body({'id': 10, 'name': 'test_object'})
         @blueprint.route('/objects/<int:object_id>', methods=['POST'])
         def create_object(object_id):
+            return jsonify({'objects': []}), 200
+
+
+        @generator.response(200, schema_two)
+        @generator.path_tag('Object02 Endpoints')
+        @blueprint.route('/objects02/<int:object_id>', methods=['GET'])
+        def retrieve_object02(object_id, child_id):
+            return jsonify({'objects': []}), 200
+            
+
+        @generator.response(201, schema_two)
+        @generator.request_body(schema_two)
+        @generator.path_tag('Object02 Endpoints')
+        @blueprint.route('/objects02/<int:object_id>', methods=['POST'])
+        def create_object02(object_id):
             return jsonify({'objects': []}), 200
