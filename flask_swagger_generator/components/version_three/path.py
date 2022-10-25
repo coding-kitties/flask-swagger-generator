@@ -40,19 +40,17 @@ class SwaggerPath(SwaggerModel):
 
     def perform_write(self, file):
         self.format_path()
-
         path_entry = "'{path}':".format(path=self.path)
         path = self.indent(path_entry, self.TAB)
         file.write(path)
         file.write("\n")
 
     def format_path(self):
-        if len(re.findall("<(.*?)>", self.path)) > 0:
 
+        if len(re.findall("<(.*?)>", self.path)) > 0:
             swagger_request_types = self.get_swagger_child_models_of_type(
                 SwaggerRequestType
             )
-
             parameters = swagger_request_types[-1]\
                 .get_swagger_child_models_of_type(
                     SwaggerParameters
@@ -65,10 +63,10 @@ class SwaggerPath(SwaggerModel):
                 )
 
                 for path_parameter in path_parameters:
-
                     self.path = self.path.replace(
                         "<{}:{}>".format(
-                            path_parameter.input_type.get_flask_input_type_value(),
+                            path_parameter.input_type
+                            .get_flask_url_variable_type_value(),
                             path_parameter.name
                         ),
                         "{" + path_parameter.name + "}"

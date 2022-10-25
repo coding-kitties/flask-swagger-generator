@@ -36,10 +36,10 @@ class Generator:
     def generate_swagger(
             self,
             app: Flask,
-            destination_path: str = None,
-            application_name: str = 'Application',
-            application_version: str = '1.0.0',
-            server_url: str = "/"
+            destination_path=None,
+            application_name='Application',
+            application_version='1.0.0',
+            server_url="/"
     ):
         self.index_endpoints(app)
 

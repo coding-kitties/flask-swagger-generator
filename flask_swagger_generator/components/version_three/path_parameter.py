@@ -1,6 +1,6 @@
 import inspect
 from flask_swagger_generator.components.swagger_models import SwaggerModel
-from flask_swagger_generator.utils import InputType
+from flask_swagger_generator.utils import UrlVariableType
 
 
 class SwaggerPathParameter(SwaggerModel):
@@ -13,7 +13,7 @@ class SwaggerPathParameter(SwaggerModel):
             required: bool = True
     ):
         super(SwaggerPathParameter, self).__init__()
-        self.input_type = InputType.from_string(input_type)
+        self.input_type = UrlVariableType.from_string(input_type)
         self.name = name
         self.description = description
         self.required = required
