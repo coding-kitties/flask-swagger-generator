@@ -1,5 +1,4 @@
-from flask_swagger_generator.specifiers.swagger_version import SwaggerVersion
-from flask_swagger_generator.specifiers.swagger_three_specifier import \
+from flask_swagger_generator.specifiers.version_three_specifier import \
     SwaggerThreeSpecifier
 
-__all__ = ['SwaggerVersion', 'SwaggerThreeSpecifier']
+__all__ = ["SwaggerThreeSpecifier"]

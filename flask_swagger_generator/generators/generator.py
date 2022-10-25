@@ -4,11 +4,10 @@ from functools import wraps
 from flask import Flask
 
 from flask_swagger_generator.exceptions import SwaggerGeneratorException
-from flask_swagger_generator.specifiers import SwaggerVersion, \
-    SwaggerThreeSpecifier
+from flask_swagger_generator.specifiers import SwaggerThreeSpecifier
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
-from flask_swagger_generator.utils import SecurityType
+from flask_swagger_generator.utils import SecurityType, SwaggerVersion
 
 
 class Generator:
@@ -65,7 +64,10 @@ class Generator:
 
             if not self.generated:
                 self.specifier.add_response(
-                    func.__name__, status_code, schema, description
+                    function_name=func.__name__,
+                    status_code=status_code,
+                    schema=schema,
+                    description=description
                 )
 
             @wraps(func)
@@ -131,8 +133,10 @@ class Generator:
             return wrapper
         return swagger_query_parameters
 
-    def create_schema(self, reference_name, properties):
-        return self.specifier.create_schema(reference_name, properties)
+    def create_schema(self, schema, reference_name=None):
+        return self.specifier.create_schema(
+            schema, reference_name=reference_name
+        )
 
     @property
     def specifier(self) -> SwaggerSpecifier:
