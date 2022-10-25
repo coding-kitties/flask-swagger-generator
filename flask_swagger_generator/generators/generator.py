@@ -38,7 +38,8 @@ class Generator:
             app: Flask,
             destination_path: str = None,
             application_name: str = 'Application',
-            application_version: str = '1.0.0'
+            application_version: str = '1.0.0',
+            server_url: str = "/"
     ):
         self.index_endpoints(app)
 
@@ -49,7 +50,8 @@ class Generator:
 
         self.specifier.set_application_name(application_name)
         self.specifier.set_application_version(application_version)
-        self.file = open(destination_path, 'w')
+        self.specifier.set_server_url(server_url)
+        self.file = open(self.destination_path, 'w')
         self.write_specification()
         self.file.close()
         self.generated = True
