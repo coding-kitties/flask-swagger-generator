@@ -8,12 +8,22 @@ from marshmallow import Schema as MarshmallowSchema
 from flask_swagger_generator.components.swagger_models import SwaggerModel
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
-from flask_swagger_generator.components.version_three import \
-    SwaggerSchema, SwaggerMashmallowSchema, SwaggerPath, SwaggerRequestBody, \
-    SwaggerSecurity, SwaggerResponse, SwaggerParameters, \
-    SwaggerQueryParameter, SwaggerPathParameter, SwaggerResponses,\
-    SwaggerRequestType, SwaggerRequestBodyComponent, SwaggerResponseComponent, \
+from flask_swagger_generator.components.version_three import (
+    SwaggerSchema,
+    SwaggerMashmallowSchema,
+    SwaggerPath,
+    SwaggerRequestBody,
+    SwaggerSecurity,
+    SwaggerResponse,
+    SwaggerParameters,
+    SwaggerQueryParameter,
+    SwaggerPathParameter,
+    SwaggerResponses,
+    SwaggerRequestType,
+    SwaggerRequestBodyComponent,
+    SwaggerResponseComponent,
     SwaggerSecurityComponent
+)
 from flask_swagger_generator.utils import SecurityType
 
 
@@ -313,7 +323,11 @@ class SwaggerThreeSpecifier(SwaggerModel, SwaggerSpecifier):
         return schema
 
     def clean(self):
-        self.schemas = []
-        self.securities = []
+        self.request_bodies = []
+        self.request_body_components = []
         self.responses = []
-        self.swagger_models = []
+        self.response_components = []
+        self.securities = []
+        self.security_components = []
+        self.schemas = []
+        self.query_parameters = []
