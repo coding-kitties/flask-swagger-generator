@@ -50,10 +50,10 @@ class UrlVariableType(Enum):
         if self == UrlVariableType.STRING:
             return 'string'
         elif self == UrlVariableType.INTEGER:
-            return 'int'
+            return 'integer'
         elif self == UrlVariableType.FLOAT:
-            return 'float'
+            return 'number'
         elif self == UrlVariableType.PATH:
-            return 'path'
+            return 'string'
         elif self == UrlVariableType.UUID:
-            return 'uuid'
+            return 'string'
