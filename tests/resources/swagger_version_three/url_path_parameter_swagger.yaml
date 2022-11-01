@@ -1,14 +1,14 @@
 openapi: 3.0.1
 info:
   title: Application
-  description: Generated at 25/10/2022 17:43:59. This is the swagger 
+  description: Generated at 01/11/2022 10:33:55. This is the swagger 
     ui based on the open api 3.0 specification of the Application
   version: 1.0.0 created by the flask swagger generator.
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'
 servers:
-  - url: /
+  - url: '/'
 paths:
   '/path-path/{path}':
     get:
@@ -19,7 +19,7 @@ paths:
       - in: path
         name: path
         schema:
-          type: path
+          type: string
         description: None
         required: True
   '/int-path/{int}':
@@ -55,7 +55,7 @@ paths:
       - in: path
         name: float
         schema:
-          type: float
+          type: number
         description: None
         required: True
 components:

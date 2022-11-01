@@ -3,27 +3,33 @@ from flask_swagger_generator.exceptions import SwaggerGeneratorException
 
 
 class UrlVariableType(Enum):
-    INTEGER = 'integer'
+    INTEGER = 'int'
     STRING = 'string'
     FLOAT = 'float'
-    PATH = 'path'
-    UUID = 'uuid'
+    PATH = "path"
+    UUID = "uuid"
+
+    @staticmethod
+    def from_value(value):
+
+        if isinstance(value, UrlVariableType):
+            for entry in UrlVariableType:
+
+                if entry == value:
+                    return entry
+
+        else:
+            return UrlVariableType.from_string(value)
 
     @staticmethod
     def from_string(value: str):
 
         if isinstance(value, str):
 
-            if value.lower() == 'string':
-                return UrlVariableType.STRING
-            elif value.lower() == 'int':
-                return UrlVariableType.INTEGER
-            elif value.lower() == 'float':
-                return UrlVariableType.FLOAT
-            elif value.lower() == 'path':
-                return UrlVariableType.PATH
-            elif value.lower() == 'uuid':
-                return UrlVariableType.UUID
+            for entry in UrlVariableType:
+
+                if entry.value == value.lower():
+                    return entry
 
         raise SwaggerGeneratorException(
             'Could not convert value {} to a input type'.format(
@@ -45,7 +51,7 @@ class UrlVariableType(Enum):
 
             return other == self.value
 
-    def get_flask_url_variable_type_value(self):
+    def get_swagger_url_path_variable_type(self):
 
         if self == UrlVariableType.STRING:
             return 'string'
@@ -57,3 +63,6 @@ class UrlVariableType(Enum):
             return 'string'
         elif self == UrlVariableType.UUID:
             return 'string'
+
+    def get_flask_url_variable_type_value(self):
+        return self.value
