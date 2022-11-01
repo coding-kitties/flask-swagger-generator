@@ -31,7 +31,7 @@ class SwaggerPathParameter(SwaggerModel):
                 name=self.name,
                 required=self.required,
                 description=self.description,
-                input_type=self.input_type.value
+                input_type=self.input_type.get_swagger_url_path_variable_type()
             )
         )
 
