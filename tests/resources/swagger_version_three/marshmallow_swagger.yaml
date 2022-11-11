@@ -1,23 +1,43 @@
 openapi: 3.0.1
 info:
   title: Application
-  description: Generated at 03/01/2021 20:29:35. This is the swagger
+  description: Generated at 25/10/2022 13:41:23. This is the swagger 
     ui based on the open api 3.0 specification of the Application
-  version: 1.0.0
+  version: 1.0.0 created by the flask swagger generator.
 externalDocs:
   description: Find out more about Swagger
   url: 'http://swagger.io'
 servers:
   - url: /
 paths:
+  '/objects':
+    get:
+      tags:
+      - objects
+      operationId: 'list_objects'
+      parameters:
+      - in: query
+        name: param1
+        schema:
+          type: string
+        description: None
+        required: False
+        allowReserved: False
+      - in: query
+        name: param2
+        schema:
+          type: integer
+        description: None
+        required: False
+        allowReserved: False
+      responses:
+        '200':
+          $ref: '#/components/responses/list_objects_response'
   '/objects/{object_id}':
     get:
       tags:
       - objects
       operationId: 'retrieve_object'
-      responses:
-        '200':
-          $ref: '#/components/responses/retrieve_object_response'
       parameters:
       - in: path
         name: object_id
@@ -25,15 +45,29 @@ paths:
           type: integer
         description: None
         required: True
+      responses:
+        '200':
+          $ref: '#/components/responses/retrieve_object_response'
     delete:
       tags:
       - objects
       operationId: 'delete_object'
+      parameters:
+      - in: path
+        name: object_id
+        schema:
+          type: integer
+        description: None
+        required: True
       responses:
         '204':
           $ref: '#/components/responses/delete_object_response'
       security:
         - bearerAuth: []
+    put:
+      tags:
+      - objects
+      operationId: 'update_object'
       parameters:
       - in: path
         name: object_id
@@ -41,10 +75,6 @@ paths:
           type: integer
         description: None
         required: True
-    put:
-      tags:
-      - objects
-      operationId: 'update_object'
       requestBody:
         $ref: '#/components/requestBodies/update_object_request_body'
       responses:
@@ -52,6 +82,10 @@ paths:
           $ref: '#/components/responses/update_object_response'
       security:
         - bearerAuth: []
+    post:
+      tags:
+      - objects
+      operationId: 'create_object'
       parameters:
       - in: path
         name: object_id
@@ -59,22 +93,11 @@ paths:
           type: integer
         description: None
         required: True
-    post:
-      tags:
-      - objects
-      operationId: 'create_object'
       requestBody:
         $ref: '#/components/requestBodies/create_object_request_body'
       responses:
         '201':
           $ref: '#/components/responses/create_object_response'
-      parameters:
-      - in: path
-        name: object_id
-        schema:
-          type: integer
-        description: None
-        required: True
 components:
   securitySchemes:
     bearerAuth:
@@ -88,33 +111,39 @@ components:
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/schema_three'
+                 $ref: '#/components/schemas/update_object'
     create_object_request_body:
       description: None
       required: True
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/create_object_request_body_schema'
+                 $ref: '#/components/schemas/create_object'
   responses:
+    list_objects_response:
+      description: list_objects response
+      content:
+         application/json:
+             schema:
+                 $ref: '#/components/schemas/list_objects_response_schema'
     retrieve_object_response:
       description: retrieve_object response
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/schema_two'
+                 $ref: '#/components/schemas/retrieve_object_response_schema'
     delete_object_response:
       description: delete_object response
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/schema_two'
+                 $ref: '#/components/schemas/delete_object_response_schema'
     update_object_response:
       description: update_object response
       content:
          application/json:
              schema:
-                 $ref: '#/components/schemas/schema_two'
+                 $ref: '#/components/schemas/update_object_response_schema'
     create_object_response:
       description: create_object response
       content:
@@ -122,46 +151,71 @@ components:
              schema:
                  $ref: '#/components/schemas/create_object_response_schema'
   schemas:
-    schema_two:
+    list_objects_response_schema:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
-    schema_three:
+    retrieve_object_response_schema:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    delete_object_response_schema:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    update_object:
       type: object
       properties:
         attribute_one:
           type: integer
-        attribute_four:
-          type: boolean
-        attribute_three:
-          type: string
-        attribute_five:
-          type: string
         attribute_two:
           type: string
+        attribute_four:
+          type: boolean
+        attribute_five:
+          type: string
         attribute_six:
-          $ref: '#/components/schemas/attribute_six'
-    attribute_six:
-      type: object
-      properties:
-        name:
+          $ref: "#/components/schemas/attribute_six_update_object"
+        attribute_three:
           type: string
-        id:
-          type: integer
-    create_object_request_body_schema:
+    attribute_six_update_object:
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
+    update_object_response_schema:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    create_object:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        name:
+          type: string
+          example: test_object
     create_object_response_schema:
       type: object
       properties:
         id:
           type: integer
+          example: 10
         name:
           type: string
+          example: test_object

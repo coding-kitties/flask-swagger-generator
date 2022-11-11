@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: Application
+  description: Generated at 01/11/2022 10:33:55. This is the swagger 
+    ui based on the open api 3.0 specification of the Application
+  version: 1.0.0 created by the flask swagger generator.
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  - url: '/'
+paths:
+  '/path-path/{path}':
+    get:
+      tags:
+      - objects
+      operationId: 'get_path_url'
+      parameters:
+      - in: path
+        name: path
+        schema:
+          type: string
+        description: None
+        required: True
+  '/int-path/{int}':
+    get:
+      tags:
+      - objects
+      operationId: 'get_int_url'
+      parameters:
+      - in: path
+        name: int
+        schema:
+          type: integer
+        description: None
+        required: True
+  '/string-path/{string}':
+    get:
+      tags:
+      - objects
+      operationId: 'get_string_url'
+      parameters:
+      - in: path
+        name: string
+        schema:
+          type: string
+        description: None
+        required: True
+  '/float-path/{float}':
+    get:
+      tags:
+      - objects
+      operationId: 'get_num_url'
+      parameters:
+      - in: path
+        name: float
+        schema:
+          type: number
+        description: None
+        required: True
+components:

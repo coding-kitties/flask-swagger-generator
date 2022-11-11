@@ -4,11 +4,10 @@ from functools import wraps
 from flask import Flask
 
 from flask_swagger_generator.exceptions import SwaggerGeneratorException
-from flask_swagger_generator.specifiers import SwaggerVersion, \
-    SwaggerThreeSpecifier
+from flask_swagger_generator.specifiers import SwaggerThreeSpecifier
 from flask_swagger_generator.specifiers.swagger_specifier \
     import SwaggerSpecifier
-from flask_swagger_generator.utils import SecurityType
+from flask_swagger_generator.utils import SecurityType, SwaggerVersion
 
 
 class Generator:
@@ -37,9 +36,10 @@ class Generator:
     def generate_swagger(
             self,
             app: Flask,
-            destination_path: str = None,
-            application_name: str = 'Application',
-            application_version: str = '1.0.0'
+            destination_path=None,
+            application_name='Application',
+            application_version='1.0.0',
+            server_url="/"
     ):
         self.index_endpoints(app)
 
@@ -50,7 +50,8 @@ class Generator:
 
         self.specifier.set_application_name(application_name)
         self.specifier.set_application_version(application_version)
-        self.file = open(destination_path, 'w')
+        self.specifier.set_server_url(server_url)
+        self.file = open(self.destination_path, 'w')
         self.write_specification()
         self.file.close()
         self.generated = True
@@ -65,7 +66,10 @@ class Generator:
 
             if not self.generated:
                 self.specifier.add_response(
-                    func.__name__, status_code, schema, description
+                    function_name=func.__name__,
+                    status_code=status_code,
+                    schema=schema,
+                    description=description
                 )
 
             @wraps(func)
@@ -131,8 +135,10 @@ class Generator:
             return wrapper
         return swagger_query_parameters
 
-    def create_schema(self, reference_name, properties):
-        return self.specifier.create_schema(reference_name, properties)
+    def create_schema(self, schema, reference_name=None):
+        return self.specifier.create_schema(
+            schema, reference_name=reference_name
+        )
 
     @property
     def specifier(self) -> SwaggerSpecifier:
